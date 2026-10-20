@@ -1,0 +1,96 @@
+name: Build APK
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: lumio-debug-keystore
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Prepare app
+        env:
+          GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
+        run: |
+          mkdir -p www && cp index.html www/index.html
+          sed -i "s|__GEMINI_KEY__|${GEMINI_KEY}|" www/index.html
+          npm init -y
+          npm i @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+          npx cap init Lumio com.studymate.app --web-dir www
+          npx cap add android
+          npx cap sync android
+      - name: Block screenshots
+        run: |
+          cat > android/app/src/main/java/com/studymate/app/MainActivity.java <<'EOF'
+          package com.studymate.app;
+          import android.os.Bundle;
+          import android.view.WindowManager;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+            @Override
+            public void onCreate(Bundle s) {
+              super.onCreate(s);
+              getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+            }
+          }
+          EOF
+      - name: Set app icon
+        run: |
+          pip install pillow || pip install --break-system-packages pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          def art(sz, k, grad):
+              S = sz * 4
+              im = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+              d = ImageDraw.Draw(im)
+              if grad:
+                  for y in range(S):
+                      t = y / S
+                      d.line([(0, y), (S, y)], fill=(int(91 + 33 * t), int(140 - 48 * t), 255, 255))
+              X = lambda v: S / 2 + (v - .5) * S * k
+              t = S * .09 * k
+              d.rectangle([X(.34), X(.24), X(.34) + t, X(.76)], fill="white")
+              d.rectangle([X(.34), X(.76) - t, X(.68), X(.76)], fill="white")
+              cx, cy, r = X(.72), X(.28), S * .11 * k
+              d.polygon([(cx, cy - r), (cx + r * .28, cy - r * .28), (cx + r, cy), (cx + r * .28, cy + r * .28), (cx, cy + r), (cx - r * .28, cy + r * .28), (cx - r, cy), (cx - r * .28, cy - r * .28)], fill="#ffe08a")
+              return im.resize((sz, sz), Image.LANCZOS)
+          def shaped(sz, round_):
+              im = art(sz, 1, True)
+              m = Image.new("L", (sz * 4, sz * 4), 0)
+              d = ImageDraw.Draw(m)
+              if round_: d.ellipse([0, 0, sz * 4 - 1, sz * 4 - 1], fill=255)
+              else: d.rounded_rectangle([0, 0, sz * 4 - 1, sz * 4 - 1], radius=int(sz * 4 * 0.22), fill=255)
+              m = m.resize((sz, sz), Image.LANCZOS)
+              out = Image.new("RGBA", (sz, sz), (0, 0, 0, 0)); out.paste(im, (0, 0), m)
+              return out
+          res = "android/app/src/main/res/"
+          for n, a, f in [("mdpi", 48, 108), ("hdpi", 72, 162), ("xhdpi", 96, 216), ("xxhdpi", 144, 324), ("xxxhdpi", 192, 432)]:
+              p = res + "mipmap-" + n + "/"
+              shaped(a, False).save(p + "ic_launcher.png")
+              shaped(a, True).save(p + "ic_launcher_round.png")
+              art(f, .62, False).save(p + "ic_launcher_foreground.png")
+          open(res + "values/ic_launcher_background.xml", "w").write('<?xml version="1.0" encoding="utf-8"?><resources><color name="ic_launcher_background">#6A6CFF</color></resources>')
+          PY
+      - name: Allow microphone
+        run: |
+          sed -i 's#<application#<uses-permission android:name="android.permission.RECORD_AUDIO" /><uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /><application#' android/app/src/main/AndroidManifest.xml
+      - name: Build
+        run: |
+          cd android && chmod +x gradlew && ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../Lumio.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          files: Lumio.apk
