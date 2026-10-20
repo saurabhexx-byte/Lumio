@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lumio</title>
+<style>
+:root{--bg:#0a0b0f;--s1:#12141a;--s2:#1a1d26;--ln:#252936;--tx:#e8eaf0;--mut:#7f8699;--ac:#5b8cff;--ok:#3ecf8e}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.v{display:none;height:100%;flex-direction:column}.v.on{display:flex}
+.pg{flex:1;overflow:auto;padding:22px 18px}
+h1{font-size:22px;font-weight:650;margin:0 0 4px;letter-spacing:-.2px}
+h2{font-size:12px;font-weight:600;color:var(--mut);margin:26px 0 10px;letter-spacing:.6px}
+.mut{color:var(--mut);font-size:13px}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+.card i{width:4px;align-self:stretch;border-radius:2px;flex:none}
+.card b{display:block;font-weight:600}
+.nav{display:flex;border-top:1px solid var(--ln);background:var(--s1)}
+.nav button{flex:1;background:none;border:0;color:var(--mut);padding:14px 0;font:inherit;font-size:13px;font-weight:500}
+.nav button.a{color:var(--tx);box-shadow:inset 0 2px 0 var(--ac)}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:11px 18px;font:inherit;font-weight:600}
+.btn.g{background:var(--s2);border:1px solid var(--ln);color:var(--tx)}
+input{width:100%;background:var(--s2);border:1px solid var(--ln);color:var(--tx);border-radius:10px;padding:11px 13px;font:inherit;outline:0}
+input:focus{border-color:var(--ac)}
+.ring{display:block;margin:22px auto}
+.ring text{fill:var(--tx);font-size:34px;font-weight:600;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;margin:10px 0}
+.code{font:600 24px ui-monospace,Menlo,monospace;letter-spacing:5px;text-align:center;margin:14px 0;color:var(--ok)}
+.hd{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--ln);background:var(--s1)}
+.hd div{flex:1}.hd b{display:block;font-weight:600}.hd small{color:var(--ok);font-size:12px;min-height:16px;display:block}
+.hd button{background:none;border:0;color:var(--mut);font:inherit;font-size:13px;padding:6px 8px}
+#msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:5px}
+.m{max-width:80%;padding:8px 12px;border-radius:14px 14px 14px 4px;background:var(--s2);align-self:flex-start;word-break:break-word}
+.m.me{align-self:flex-end;background:#25457f;border-radius:14px 14px 4px 14px}
+.m.st{font-size:44px;background:none;padding:0}
+.q{border-left:3px solid var(--ac);padding:1px 8px;margin-bottom:4px;font-size:12px;color:var(--mut)}
+.m small{display:block;font-size:11px;opacity:.55;margin-top:2px;text-align:right}
+.rx{display:inline-block;background:var(--s1);border:1px solid var(--ln);border-radius:10px;padding:0 6px;font-size:13px;margin-top:3px}
+.bar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--ln);background:var(--s1);align-items:center}
+.bar .t{background:none;border:0;color:var(--mut);font:inherit;font-size:13px;padding:8px 4px}
+.bar .t.rec{color:#ff5d5d}
+#rp{display:none;padding:6px 14px;background:var(--s1);border-top:1px solid var(--ln);font-size:12px;color:var(--mut)}
+#em{display:none;padding:10px;background:var(--s1);border-top:1px solid var(--ln);flex-wrap:wrap;gap:2px}
+#em span{font-size:24px;padding:4px 6px}#em .s{font-size:38px}
+#sh{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:8}
+#sh div{width:100%;background:var(--s1);border-top:1px solid var(--ln);border-radius:16px 16px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom))}
+#sh .e{display:flex;justify-content:space-around;font-size:28px;margin-bottom:8px}
+#sh button{display:block;width:100%;background:none;border:0;border-top:1px solid var(--ln);color:var(--tx);font:inherit;padding:13px}
+#ov{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;z-index:9}
+#ov img{max-width:100%;max-height:100%}#ov span{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:16px;font-weight:600}
+select{width:100%;background:var(--s2);border:1px solid var(--ln);color:var(--tx);border-radius:10px;padding:11px 13px;font:inherit;margin-bottom:10px}
+mark{background:#5b8cff55;color:inherit;border-radius:3px;padding:0 2px}.sr{cursor:pointer}.sr ul{margin-top:8px}
+.dt{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:14px 16px;margin-top:8px}.dt summary{font-weight:600;cursor:pointer}.dt ul{margin:10px 0 0;padding-left:18px;color:var(--mut);font-size:14px}.dt li{margin-bottom:6px}
+.hero{background:linear-gradient(135deg,#17213f,#12141a);border:1px solid var(--ln);border-radius:16px;padding:18px;margin:16px 0 10px}
+.hero .big{font-size:38px;font-weight:650;letter-spacing:-1px;margin:2px 0 10px}.hero .big span{font-size:14px;font-weight:500;color:var(--mut);letter-spacing:0}
+.pb{height:6px;background:var(--ln);border-radius:3px;overflow:hidden}.pb i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stats div{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:12px 14px}
+.stats b{display:block;font-size:20px;font-weight:650}.stats span{color:var(--mut);font-size:12px}
+.sj{align-items:center}.sj em{font-style:normal;font-size:12px;color:var(--mut);border:1px solid var(--ln);border-radius:8px;padding:3px 9px}.sj em.ok{color:var(--ok);border-color:var(--ok)}
+#chat{--bg:#160c15;--s1:#21111d;--s2:#2e1a28;--ln:#44283a;--ac:#ff7a9c;--ok:#ffb3c6;--mut:#b99aab;background:radial-gradient(120% 70% at 50% 0,#33142b 0,#160c15 70%)}
+#chat .m.me{background:linear-gradient(135deg,#d4507c,#9c3466)}#chat .m{background:#2e1a28}#chat .m.st{background:none}
+#chat .hd,#chat .bar,#chat #em,#chat #rp{background:#1b0d18cc}
+</style></head><body>
+
+<div id="study" class="v on">
+ <div class="pg" id="pg"></div>
+ <div class="nav"><button data-t="notes" class="a">Notes</button><button data-t="timer">Timer</button><button data-t="prof" id="pbtn">Profile</button></div>
+</div>
+
+<div id="chat" class="v">
+ <div class="hd"><div><b>Chat</b><small id="ty"></small></div><button id="cdb">Code</button><button id="unp">Unpair</button><button id="hide">Close</button></div>
+ <div id="msgs"></div>
+ <div id="rp"></div>
+ <div id="em"></div>
+ <div class="bar"><button class="t" id="eb">Emoji</button><button class="t" id="ph">Photo</button><button class="t" id="mc">Voice</button><input id="tx" placeholder="Message" autocomplete="off"><button class="btn" id="sd">Send</button></div>
+ <input type="file" id="fi" accept="image/*" hidden>
+</div>
+<div id="sh"><div><div class="e" id="shr"></div><button id="shp">Reply</button><button id="shd" style="color:#ff6b6b">Delete</button></div></div>
+<div id="ov"><span id="cd"></span><img id="oi"></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import{getFirestore,doc,setDoc,getDoc,updateDoc,deleteDoc,collection,addDoc,getDocs,query,orderBy,onSnapshot}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyBNe0nGIROKoZ07CSs423Gz1pHiNwunYqQ",authDomain:"lumio-36b6f.firebaseapp.com",projectId:"lumio-36b6f",storageBucket:"lumio-36b6f.firebasestorage.app",messagingSenderId:"144455607250",appId:"1:144455607250:web:b4ba12fadf6586990d9e0b"});
+const auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);
+let uid=null,unsub=null,rows=[],reply=null,sel=null,seenSet=new Set(),lt=0,rc=null,chunks=[];
+const ready=signInAnonymously(auth).then(c=>uid=c.user.uid).catch(()=>{});
+const code=()=>localStorage.getItem("pc");
+const msgsCol=()=>collection(db,"pairs",code(),"msgs");
+const mref=id=>doc(db,"pairs",code(),"msgs",id);
+
+/* study side */
+let NOTES=[["Physics","Newton's laws, work-energy theorem, SHM basics","#5b8cff"],["Chemistry","Periodic trends, mole concept, chemical bonding","#3ecf8e"],["Maths","Quadratics, trigonometric identities, limits","#f5a524"],["Biology","Cell structure, photosynthesis, human physiology","#e5568f"]];
+const QUOTES=["Small steps every day beat big plans someday.","Revise today, relax on exam day.","Focus for 25 minutes. The rest can wait."];
+let TT=+localStorage.getItem("tt")||1500,tt=TT,ti=null;
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+const ring=()=>{const C=2*Math.PI*88,o=C*(1-tt/TT);return`<svg class="ring" width="220" height="220" viewBox="0 0 220 220"><circle cx="110" cy="110" r="88" fill="none" stroke="#252936" stroke-width="8"/><circle id="rg" cx="110" cy="110" r="88" fill="none" stroke="#5b8cff" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${o}" transform="rotate(-90 110 110)"/><text id="tm" x="110" y="122" text-anchor="middle">${fmt(tt)}</text></svg>`};
+const stat=()=>{try{const s=JSON.parse(localStorage.getItem("fs")||"{}");return s.d===new Date().toDateString()?s.m:0}catch(e){return 0}};
+const addMin=()=>localStorage.setItem("fs",JSON.stringify({d:new Date().toDateString(),m:stat()+Math.round(TT/60)}));
+const LIB={
+Physics:[["Light: Reflection and Refraction",["Law of reflection: angle of incidence = angle of reflection.","Mirror formula: 1/v + 1/u = 1/f. Magnification m = -v/u.","Concave mirror converges light; convex mirror diverges light.","Snell's law: n = sin i / sin r. Refractive index n = c / v.","Lens formula: 1/v - 1/u = 1/f. Power P = 1/f (f in metres), unit dioptre.","Convex lens converges light; concave lens diverges light."]],
+["Electricity",["Ohm's law: V = I R.","Resistance R = ρ l / A.","Series: R = R1 + R2 + R3. Parallel: 1/R = 1/R1 + 1/R2 + 1/R3.","Heating effect: H = I² R t.","Power P = V I = I² R = V² / R. Unit: watt.","1 kWh = 3.6 × 10⁶ J."]],
+["Magnetic Effects of Current",["A current-carrying wire produces a magnetic field around it.","Right-hand thumb rule gives the direction of the field.","Fleming's left-hand rule gives the direction of force on a conductor.","Electric motor converts electrical energy to mechanical energy.","Electromagnetic induction: a changing magnetic field induces current.","Generator converts mechanical energy to electrical energy."]]],
+Chemistry:[["Chemical Reactions and Equations",["A balanced equation has equal atoms of each element on both sides.","Types: combination, decomposition, displacement, double displacement, redox.","Exothermic reactions release heat; endothermic reactions absorb heat.","Rusting and rancidity are oxidation reactions seen in daily life."]],
+["Acids, Bases and Salts",["Acids turn blue litmus red; bases turn red litmus blue.","pH scale 0 to 14: below 7 acidic, 7 neutral, above 7 basic.","Neutralisation: acid + base → salt + water.","Baking soda: NaHCO₃. Washing soda: Na₂CO₃·10H₂O. Bleaching powder: CaOCl₂.","Plaster of Paris: CaSO₄·½H₂O."]],
+["Carbon and its Compounds",["Carbon forms covalent bonds and shows catenation (long chains).","Saturated: alkanes (single bonds). Unsaturated: alkenes and alkynes.","Functional groups: alcohol -OH, aldehyde -CHO, ketone C=O, acid -COOH.","Esterification: acid + alcohol → ester + water.","Soaps clean by forming micelles around dirt."]]],
+Maths:[["Real Numbers and Polynomials",["Euclid's division lemma: a = bq + r, where 0 ≤ r < b.","HCF × LCM = product of the two numbers.","For ax² + bx + c: sum of zeroes = -b/a, product = c/a.","Irrational numbers like √2 cannot be written as p/q."]],
+["Quadratic Equations",["Standard form: ax² + bx + c = 0, with a ≠ 0.","Formula: x = (-b ± √(b² - 4ac)) / 2a.","Discriminant D = b² - 4ac. D > 0: two real roots. D = 0: equal roots. D < 0: no real roots."]],
+["Trigonometry",["sin θ = perpendicular/hypotenuse, cos θ = base/hypotenuse, tan θ = perpendicular/base.","sin² θ + cos² θ = 1.","1 + tan² θ = sec² θ and 1 + cot² θ = cosec² θ.","sin at 0°, 30°, 45°, 60°, 90°: 0, 1/2, 1/√2, √3/2, 1."]]],
+Biology:[["Life Processes",["Nutrition can be autotrophic (photosynthesis) or heterotrophic.","Photosynthesis: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂, using light and chlorophyll.","The human heart has four chambers and blood follows double circulation.","Kidneys filter blood. The functional unit is the nephron."]],
+["Control and Coordination",["Neuron is the structural and functional unit of the nervous system.","Reflex action is quick and involuntary, controlled by the spinal cord.","Brain parts: fore-brain, mid-brain, hind-brain.","Plant hormones: auxin, gibberellin, cytokinin, abscisic acid, ethylene.","Animal hormones: insulin (pancreas), thyroxine (thyroid), adrenaline (adrenal)."]],
+["Heredity",["Mendel studied pea plants and gave the laws of inheritance.","The dominant trait shows in F1; the recessive trait reappears in F2 (3:1 ratio).","Sex determination in humans: XX is female, XY is male; the father decides.","Traits are carried by genes on chromosomes."]]]};
+function openSub(n){const p=$("#pg");p.innerHTML=`<button class="btn g" id="bk">Back</button><h1 style="margin-top:16px">${n}</h1><p class="mut">Class 10 key points</p>`+LIB[n].map(c=>`<details class="dt"><summary>${c[0]}</summary><ul>${c[1].map(x=>`<li>${x}</li>`).join("")}</ul></details>`).join("");$("#bk").onclick=()=>tab("notes")}
+const COL=["#5b8cff","#3ecf8e","#f5a524","#e5568f","#a78bfa","#38bdf8"];
+const buildNotes=()=>{NOTES=Object.keys(LIB).map((k,i)=>[k,LIB[k].slice(0,3).map(c=>c[0]).join(", "),COL[i%COL.length]])};
+try{Object.assign(LIB,JSON.parse(localStorage.getItem("nj")||"{}"));buildNotes()}catch(e){}
+fetch("https://raw.githubusercontent.com/saurabhexx-byte/Lumio/main/notes.json").then(r=>r.json()).then(j=>{localStorage.setItem("nj",JSON.stringify(j));Object.assign(LIB,j);buildNotes();if(document.querySelector('.nav button[data-t="notes"]').classList.contains("a")&&!document.querySelector("#bk"))tab("notes")}).catch(()=>{});
+const hl=(t,w)=>w.reduce((a,x)=>a.replace(new RegExp("("+x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi"),"<mark>$1</mark>"),t);
+function setupSearch(){const q=$("#sq");q.onkeydown=e=>{if(e.key==="Enter")ask(q.value.trim())};q.oninput=()=>{
+ const w=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean),r=$("#sr"),d=$("#dash");
+ if(!w.length){r.innerHTML="";d.style.display="";return}
+ d.style.display="none";let n=0,h="";
+ for(const s in LIB)LIB[s].forEach(c=>{
+  const m=c[1].filter(b=>{const t=(s+" "+c[0]+" "+b).toLowerCase();return w.every(x=>t.includes(x))});
+  if(m.length&&n<8){n+=Math.min(3,m.length);h+=`<div class="dt sr" data-s="${esc(s)}"><b>${esc(c[0])}</b> <span class="mut">${esc(s)}</span><ul>${m.slice(0,3).map(b=>`<li>${hl(esc(b),w)}</li>`).join("")}</ul></div>`}
+ });
+ r.innerHTML=h||`<p class="mut" style="margin-top:16px">No saved notes found for "${esc(q.value)}".</p>`;
+ r.querySelectorAll(".sr").forEach(e=>e.onclick=()=>openSub(e.dataset.s));
+ if(GKEY&&!GKEY.startsWith("__")){
+ r.insertAdjacentHTML("afterbegin",'<div class="dt" id="ai" style="cursor:default"><b>Ask AI</b><button class="btn" id="ab" style="float:right;padding:6px 14px">Get notes</button><div id="ao" class="mut" style="margin-top:10px;clear:both">AI writes short exam notes on this topic.</div></div>');
+ $("#ab").onclick=()=>ask(q.value.trim());
+ }
+ r.insertAdjacentHTML("beforeend",'<div id="wb"></div>');clearTimeout(tm);const qs=w.join(" ");tm=setTimeout(()=>web(qs),500);
+}}
+const GKEY="__GEMINI_KEY__",GMODEL="gemini-2.5-flash-lite";
+async function ask(t){
+ const o=$("#ao");if(!o||t.length<2)return;
+ const k=t.toLowerCase().replace(/[^a-z0-9\u0900-\u097F]+/g,"_").replace(/^_+|_+$/g,"").slice(0,80);
+ const show=tx=>{const x=$("#ao");if(x){x.className="";x.innerHTML=esc(tx).replace(/^\s*[*-] /gm,"• ").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>")}};
+ const fail=m=>{const x=$("#ao");if(x)x.textContent=m};
+ o.textContent="Writing notes...";
+ if(k){
+  const l=localStorage.getItem("ai_"+k);if(l){show(l);return}
+  try{await ready;const c=await getDoc(doc(db,"aicache",k));if(c.exists()){const v=c.data().t;localStorage.setItem("ai_"+k,v);show(v);return}}catch(e){}
+ }
+ if(!GKEY||GKEY.startsWith("__")){fail("AI is not set up yet.");return}
+ fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GMODEL}:generateContent?key=${GKEY}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:"You are a study helper for a Class 10 student. Explain the topic below as very short exam notes: one line of definition, then at most 4 short bullet points (one line each) with key facts or formulas. No introduction and no conclusion. Use simple English, or Hindi if the topic is written in Hindi. Topic: "+t}]}],generationConfig:{maxOutputTokens:500,temperature:.4}})}).then(r=>r.json()).then(j=>{
+  const c=j.candidates&&j.candidates[0]&&j.candidates[0].content,tx=c&&c.parts?c.parts.map(p=>p.text||"").join(""):"";
+  if(tx){show(tx);if(k){localStorage.setItem("ai_"+k,tx);setDoc(doc(db,"aicache",k),{t:tx,ts:Date.now()}).catch(()=>{})}}
+  else fail((j.error&&j.error.code===429)?"AI limit reached for now. Please try again later.":"AI could not answer right now.")
+ }).catch(()=>fail("AI needs internet."))
+}
+let tm,tk=0;
+function web(qs){
+ const e=$("#wb");if(!e||qs.length<3)return;const my=++tk;e.innerHTML='<p class="mut" style="margin-top:14px">Searching online...</p>';
+ const L=/[\u0900-\u097F]/.test(qs)?"hi":"en";
+ fetch(`https://${L}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(qs)}&gsrlimit=3&prop=extracts&exintro=1&explaintext=1&exchars=300&format=json&origin=*`).then(r=>r.json()).then(j=>{
+  if(my!==tk||!$("#wb"))return;
+  const ps=Object.values((j.query||{}).pages||{}).sort((a,b)=>a.index-b.index);
+  $("#wb").innerHTML=ps.length?`<h2>FROM THE WEB</h2>`+ps.map(x=>`<div class="dt"><b>${esc(x.title)}</b><p class="mut" style="margin:6px 0">${esc(x.extract||"")}</p><a href="https://${L}.wikipedia.org/wiki/${encodeURIComponent(x.title.replace(/ /g,"_"))}" target="_blank" rel="noopener" style="color:var(--ac);font-size:13px">Read more</a></div>`).join(""):""
+ }).catch(()=>{if(my===tk&&$("#wb"))$("#wb").innerHTML='<p class="mut" style="margin-top:14px">Online results need internet.</p>'})
+}
+function tab(t){
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("a",b.dataset.t===t));
+ const p=$("#pg");
+ if(t==="notes"){const h=new Date().getHours(),g=h<12?"Good morning":h<17?"Good afternoon":"Good evening",f=pf(),m=stat(),gl=+localStorage.getItem("goal")||100;
+  p.innerHTML=`<h1>${g}${f.n?", "+esc(f.n):""}</h1><p class="mut">What do you want to study today?</p><input id="sq" placeholder="Search any topic, e.g. Ohm's law" style="margin-top:16px;padding:14px 16px;font-size:16px"><div id="sr"></div><div id="dash"><div class="hero"><div class="mut">Today's focus</div><div class="big">${m} <span>of ${gl} min</span></div><div class="pb"><i style="width:${Math.min(100,m/gl*100)}%"></i></div></div><p class="mut" style="margin-top:18px">Type a topic above to get notes from your library, AI and the web.</p></div>`;
+  setupSearch()}
+ if(t==="timer"){p.innerHTML=`<h1>Focus timer</h1><p class="mut">${Math.round(TT/60)}-minute study session</p><div class="row" id="pz">${[15,25,45,60].map(x=>`<button class="btn ${x*60===TT?"":"g"}" data-m="${x}" style="flex:1;padding:9px 0">${x}</button>`).join("")}</div><div class="row"><input id="cm" type="number" min="1" max="180" placeholder="Custom minutes"><button class="btn g" id="cs">Set</button></div>${ring()}<div class="row"><button class="btn" id="ts" style="flex:1">${ti?"Pause":"Start"}</button><button class="btn g" id="tr" style="flex:1">Reset</button></div>`;
+  $("#ts").onclick=()=>{if(ti){clearInterval(ti);ti=null}else ti=setInterval(()=>{tt=Math.max(0,tt-1);const e=$("#tm");if(e){e.textContent=fmt(tt);$("#rg").setAttribute("stroke-dashoffset",2*Math.PI*88*(1-tt/TT))}if(!tt){clearInterval(ti);ti=null;addMin()}},1000);tab("timer")};
+  $("#tr").onclick=()=>{clearInterval(ti);ti=null;tt=TT;tab("timer")};
+  const setT=m=>{clearInterval(ti);ti=null;TT=m*60;tt=TT;localStorage.setItem("tt",TT);tab("timer")};
+  document.querySelectorAll("#pz button").forEach(b=>b.onclick=()=>setT(+b.dataset.m));
+  $("#cs").onclick=()=>{const v=Math.round(+$("#cm").value);if(v>=1&&v<=180)setT(v)}}
+ if(t==="prof"){const f=pf(),gl=+localStorage.getItem("goal")||100;
+  p.innerHTML=`<h1>Profile</h1><p class="mut">Your details stay on this phone.</p><h2>ABOUT YOU</h2><div class="card" style="display:block"><input id="pn" placeholder="Name" value="${esc(f.n||"")}" style="margin-bottom:10px"><div class="row" style="margin-top:0"><input id="pa" type="number" placeholder="Age" value="${esc(f.a||"")}"><input id="pcl" placeholder="Class" value="${esc(f.c||"")}"></div><button class="btn" id="ps" style="width:100%">Save</button><p class="mut" id="pm" style="margin:8px 0 0"></p></div><h2>SETTINGS</h2><div class="card" style="display:block"><div class="mut" style="margin-bottom:6px">Daily focus goal (minutes)</div><select id="gs">${[50,100,150,200].map(x=>`<option${x===gl?" selected":""}>${x}</option>`).join("")}</select><button class="btn g" id="cc" style="width:100%">Clear saved AI notes</button></div>`;
+  $("#ps").onclick=()=>{localStorage.setItem("pf",JSON.stringify({n:$("#pn").value.trim(),a:$("#pa").value.trim(),c:$("#pcl").value.trim()}));$("#pm").textContent="Saved."};
+  $("#gs").onchange=e=>localStorage.setItem("goal",e.target.value);
+  $("#cc").onclick=()=>{Object.keys(localStorage).filter(k=>k.startsWith("ai_")).forEach(k=>localStorage.removeItem(k));$("#cc").textContent="Cleared"}}
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{tab(b.dataset.t);if(b.id==="pbtn")dbl()});
+let last=0;
+const pf=()=>{try{return JSON.parse(localStorage.getItem("pf")||"{}")}catch(e){return{}}};
+function pairCard(){const g=$("#pg");g.insertAdjacentHTML("beforeend",`<h2>STUDY BUDDY</h2><div class="card" style="display:block"><button class="btn" id="gen" style="width:100%">Generate code</button><div class="code" id="cv"></div><input id="ci" placeholder="Enter code" autocapitalize="characters"><div class="row"><button class="btn g" id="jn" style="flex:1">Join</button></div><p class="mut" id="ms" style="margin:0"></p></div>`);$("#gen").onclick=gen;$("#jn").onclick=join;g.scrollTop=g.scrollHeight}
+function dbl(){const n=Date.now();if(n-last<350){if(code())openChat();else pairCard()}last=n}
+
+/* pairing */
+async function gen(){
+ await ready;const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let c="";
+ for(let i=0;i<8;i++)c+=A[Math.floor(Math.random()*A.length)];
+ try{await setDoc(doc(db,"pairs",c),{a:uid,b:null,ts:Date.now()});localStorage.setItem("pc",c);$("#cv").textContent=c;$("#ms").textContent="Share this code with your partner."}
+ catch(e){$("#ms").textContent="Could not create a code. Check your internet."}
+}
+async function join(){
+ await ready;const c=$("#ci").value.trim().toUpperCase(),m=$("#ms");if(!c)return;
+ try{const r=doc(db,"pairs",c),s=await getDoc(r);
+  if(!s.exists()){m.textContent="Code not found. Check it and try again.";return}
+  const d=s.data();
+  if(d.a!==uid&&d.b!==uid){if(d.b){m.textContent="This code is already in use.";return}await updateDoc(r,{b:uid})}
+  localStorage.setItem("pc",c);openChat();
+ }catch(e){m.textContent="Could not join. Check your internet."}
+}
+
+/* chat */
+function openChat(){
+ $("#study").classList.remove("on");$("#chat").classList.add("on");if(unsub)unsub();
+ unsub=onSnapshot(query(msgsCol(),orderBy("ts")),s=>{rows=s.docs.map(d=>({id:d.id,...d.data()}));draw()});
+}
+function closeChat(){$("#chat").classList.remove("on");$("#study").classList.add("on");$("#ov").style.display="none";$("#sh").style.display="none";if(unsub){unsub();unsub=null}tab("notes")}
+const del=id=>deleteDoc(mref(id)).catch(()=>{});
+function draw(){
+ const now=Date.now(),box=$("#msgs");box.innerHTML="";
+ const other=rows.find(r=>r.type==="ty"&&r.id!=="ty_"+uid&&now-r.ts<4000);$("#ty").textContent=other?"typing...":"";
+ const lastMine=[...rows].reverse().find(r=>r.from===uid&&r.type!=="ty");
+ rows.forEach(m=>{
+  if(m.type==="ty")return;
+  const dead=m.type==="t"||m.type==="s"?now>m.ts+3e5:m.vt?now>m.vt+6e4:now>m.ts+864e5;
+  if(dead){del(m.id);return}
+  const me=m.from===uid,e=document.createElement("div");e.className="m"+(me?" me":"")+(m.type==="s"?" st":"");
+  let h=m.q?`<div class="q">${esc(m.q)}</div>`:"";
+  if(m.type==="t")h+=esc(m.t);else if(m.type==="s")h+=esc(m.t);
+  else if(m.type==="i")h+=me?"Photo sent":"Photo. Tap to view";
+  else h+=me?"Voice note sent":"Voice note. Tap to play";
+  const rx=Object.values(m.r||{});if(rx.length)h+=`<div><span class="rx">${rx.join(" ")}</span></div>`;
+  if(me&&m===lastMine)h+=`<small>${m.seen?"Seen":"Sent"}</small>`;
+  e.innerHTML=h;
+  e.onclick=()=>{if(!me&&(m.type==="i"||m.type==="v")&&!m.vt)media(m);else menu(m)};
+  if(!me&&(m.type==="i"||m.type==="v"))e.ondblclick=()=>media(m);
+  box.appendChild(e);
+  if(!me&&!m.seen&&!seenSet.has(m.id)){seenSet.add(m.id);updateDoc(mref(m.id),{seen:true}).catch(()=>{})}
+ });
+ box.scrollTop=box.scrollHeight;
+}
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+setInterval(()=>{if($("#chat").classList.contains("on"))draw()},3000);
+
+function menu(m){
+ sel=m;$("#shr").innerHTML=["👍","❤️","😂","😮","😢"].map(x=>`<span>${x}</span>`).join("");
+ $("#shr").querySelectorAll("span").forEach(s=>s.onclick=()=>{updateDoc(mref(m.id),{["r."+uid]:s.textContent}).catch(()=>{});$("#sh").style.display="none"});
+ $("#shp").style.display=m.type==="t"?"block":"none";$("#shd").style.display=m.from===uid?"block":"none";
+ $("#sh").style.display="flex";
+}
+$("#sh").onclick=e=>{if(e.target.id==="sh")$("#sh").style.display="none"};
+$("#shp").onclick=()=>{reply=sel.t;$("#rp").style.display="block";$("#rp").textContent="Replying: "+reply.slice(0,60);$("#sh").style.display="none";$("#tx").focus()};
+$("#shd").onclick=()=>{del(sel.id);$("#sh").style.display="none"};
+$("#rp").onclick=()=>{reply=null;$("#rp").style.display="none"};
+
+async function media(m){
+ if(!m.vt){m.vt=Date.now();updateDoc(mref(m.id),{vt:m.vt}).catch(()=>{})}
+ if(m.type==="v"){new Audio(m.d).play();return}
+ $("#oi").src=m.d;$("#ov").style.display="flex";
+ const t=setInterval(()=>{const l=Math.round((m.vt+6e4-Date.now())/1000);$("#cd").textContent=l+"s";
+  if(l<=0){clearInterval(t);$("#ov").style.display="none";$("#oi").src="";draw()}},500);
+ $("#ov").onclick=()=>{clearInterval(t);$("#ov").style.display="none";$("#oi").src=""};
+}
+const send=o=>addDoc(msgsCol(),{from:uid,ts:Date.now(),...o});
+$("#sd").onclick=async()=>{
+ const v=$("#tx").value.trim();if(!v)return;$("#tx").value="";
+ const o={type:"t",t:v};if(reply){o.q=reply;reply=null;$("#rp").style.display="none"}
+ await send(o);
+};
+$("#tx").onkeydown=e=>{if(e.key==="Enter")$("#sd").click()};
+$("#tx").oninput=()=>{const n=Date.now();if(n-lt>2500){lt=n;setDoc(mref("ty_"+uid),{type:"ty",ts:n}).catch(()=>{})}};
+
+const EM="😀 😂 😍 🥰 😘 😊 😉 😎 🤗 😴 😢 😡 👍 🙏 👏 🔥 ❤️ 💔 🎉 ✨".split(" "),ST="🥰 😘 🤗 ❤️ 😂 😴 🎉 👍".split(" ");
+$("#em").innerHTML=EM.map(x=>`<span>${x}</span>`).join("")+"<div style='width:100%'></div>"+ST.map(x=>`<span class="s">${x}</span>`).join("");
+$("#em").querySelectorAll("span").forEach(s=>s.onclick=()=>{if(s.classList.contains("s"))send({type:"s",t:s.textContent});else $("#tx").value+=s.textContent});
+$("#eb").onclick=()=>{const e=$("#em");e.style.display=e.style.display==="flex"?"none":"flex"};
+
+$("#ph").onclick=()=>$("#fi").click();
+$("#fi").onchange=e=>{
+ const f=e.target.files[0];if(!f)return;const im=new Image();
+ im.onload=()=>{const k=Math.min(1,720/Math.max(im.width,im.height)),c=document.createElement("canvas");
+  c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+  send({type:"i",d:c.toDataURL("image/jpeg",.55)})};
+ im.src=URL.createObjectURL(f);e.target.value="";
+};
+$("#mc").onclick=async()=>{
+ if(rc){rc.stop();return}
+ try{
+  const st=await navigator.mediaDevices.getUserMedia({audio:true});
+  rc=new MediaRecorder(st,{audioBitsPerSecond:24000});chunks=[];
+  rc.ondataavailable=e=>chunks.push(e.data);
+  rc.onstop=()=>{st.getTracks().forEach(t=>t.stop());const r=new FileReader();
+   r.onload=()=>send({type:"v",d:r.result});r.readAsDataURL(new Blob(chunks,{type:rc.mimeType}));
+   rc=null;$("#mc").textContent="Voice";$("#mc").classList.remove("rec")};
+  rc.start();$("#mc").textContent="Stop";$("#mc").classList.add("rec");
+  setTimeout(()=>{if(rc&&rc.state==="recording")rc.stop()},45000);
+ }catch(e){alert("Microphone permission is needed for voice notes.")}
+};
+$("#hide").onclick=closeChat;
+$("#cdb").onclick=()=>alert("Your code: "+code());
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&$("#chat").classList.contains("on"))closeChat()});
+$("#unp").onclick=async()=>{
+ if(!confirm("Unpair and delete this chat?"))return;
+ try{const s=await getDocs(msgsCol());await Promise.all(s.docs.map(d=>deleteDoc(d.ref)));await deleteDoc(doc(db,"pairs",code()))}catch(e){}
+ localStorage.removeItem("pc");closeChat();
+};
+tab("notes");
+</script></body></html>
